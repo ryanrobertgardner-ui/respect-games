@@ -25,6 +25,7 @@
   --t1:#7d9cf2; --t2:#f07a52; --t3:#3cc1b2; --t4:#c08ae6; --t5:#e2b33c; --t6:#ef6f9b; color-scheme:dark}
 
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.45;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
 .wrap{max-width:1180px;margin:0 auto;display:grid;gap:18px}
@@ -45,7 +46,7 @@ header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-betw
 .kicker{font-family:var(--display);font-weight:800;text-transform:uppercase;letter-spacing:.08em;font-size:.85rem;color:var(--acc)}
 .count{font-variant-numeric:tabular-nums;color:var(--muted);font-weight:700}
 h1.title{font-family:var(--display);font-weight:800;font-size:clamp(2rem,4.6vw,3.4rem);line-height:1;margin:0;text-wrap:balance}
-.prompt{font-family:var(--display);font-weight:600;font-size:clamp(1.5rem,3.6vw,2.6rem);line-height:1.2;margin:0;text-wrap:balance;min-height:3.6em;display:flex;align-items:center}
+.prompt{font-family:var(--display);font-weight:600;font-size:clamp(1.5rem,3.6vw,2.6rem);line-height:1.2;margin:0;text-wrap:balance;min-height:2.4em}
 .sib .prompt::before{content:"“";color:var(--acc);margin-right:.08em}
 .sib .prompt::after{content:"”";color:var(--acc);margin-left:.04em}
 .task{font-size:1.1rem;color:var(--muted);margin:0}
