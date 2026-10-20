@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Respect at Work Games</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+/* Layout: projector stage. Game switch on top, one big card in the middle, team scoreboard docked beneath. */
+:root{
+  --bg:#e9eef2; --surface:#ffffff; --ink:#14212b; --muted:#56646f; --line:#cdd6dd; --soft:#dfe6eb;
+  --sib:#0d7a70; --sib-soft:#d5efeb;      /* Say It Better */
+  --ntb:#c4461d; --ntb-soft:#f8e1d7;      /* Name That Barrier */
+  --good:#1d7a45; --t1:#2f5bd3; --t2:#c4461d; --t3:#0d7a70; --t4:#8a3fb5; --t5:#b7860b; --t6:#c02c62;
+  --display:"Bricolage Grotesque","Arial Narrow",Arial,sans-serif;
+  --body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f161c; --surface:#18222b; --ink:#e7eef3; --muted:#9aa9b5; --line:#2c3a46; --soft:#22303b;
+  --sib:#3cc1b2; --sib-soft:#123631; --ntb:#f07a52; --ntb-soft:#3b2017; --good:#4cc47f;
+  --t1:#7d9cf2; --t2:#f07a52; --t3:#3cc1b2; --t4:#c08ae6; --t5:#e2b33c; --t6:#ef6f9b; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f161c; --surface:#18222b; --ink:#e7eef3; --muted:#9aa9b5; --line:#2c3a46; --soft:#22303b;
+  --sib:#3cc1b2; --sib-soft:#123631; --ntb:#f07a52; --ntb-soft:#3b2017; --good:#4cc47f;
+  --t1:#7d9cf2; --t2:#f07a52; --t3:#3cc1b2; --t4:#c08ae6; --t5:#e2b33c; --t6:#ef6f9b; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+.wrap{max-width:1180px;margin:0 auto;display:grid;gap:18px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+body{--acc:var(--sib);--acc-soft:var(--sib-soft)}
+body.ntb{--acc:var(--ntb);--acc-soft:var(--ntb-soft)}
+
+header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.tabs{display:flex;gap:6px;background:var(--soft);padding:5px;border-radius:14px;flex-wrap:wrap}
+.tab{border:0;background:transparent;padding:10px 18px;border-radius:10px;font-family:var(--display);font-weight:800;font-size:1.05rem;color:var(--muted)}
+.tab[aria-selected="true"]{background:var(--surface);color:var(--acc);box-shadow:0 1px 3px rgb(0 0 0/.12)}
+.meta{color:var(--muted);font-size:.95rem}
+
+.stage{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:clamp(20px,4vw,44px);display:grid;gap:22px;position:relative;overflow:hidden}
+.stage::before{content:"";position:absolute;inset:0 0 auto;height:8px;background:var(--acc)}
+.top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.kicker{font-family:var(--display);font-weight:800;text-transform:uppercase;letter-spacing:.08em;font-size:.85rem;color:var(--acc)}
+.count{font-variant-numeric:tabular-nums;color:var(--muted);font-weight:700}
+h1.title{font-family:var(--display);font-weight:800;font-size:clamp(2rem,4.6vw,3.4rem);line-height:1;margin:0;text-wrap:balance}
+.prompt{font-family:var(--display);font-weight:600;font-size:clamp(1.5rem,3.6vw,2.6rem);line-height:1.2;margin:0;text-wrap:balance;min-height:3.6em;display:flex;align-items:center}
+.sib .prompt::before{content:"“";color:var(--acc);margin-right:.08em}
+.sib .prompt::after{content:"”";color:var(--acc);margin-left:.04em}
+.task{font-size:1.1rem;color:var(--muted);margin:0}
+
+.timer{display:flex;align-items:center;gap:8px}
+.clock{font-family:var(--display);font-weight:800;font-size:1.9rem;font-variant-numeric:tabular-nums;min-width:3.2ch;text-align:right}
+.clock.low{color:var(--ntb)}
+.clock.done{color:var(--ntb);animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:.25}}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-weight:700;font-size:.9rem}
+.chip.on{background:var(--acc);border-color:var(--acc);color:var(--surface)}
+
+.barriers{display:flex;flex-wrap:wrap;gap:8px}
+.barrier{border:1.5px solid var(--line);border-radius:10px;padding:7px 13px;font-weight:700;background:var(--bg);transition:background .2s,border-color .2s,color .2s}
+.barrier.hit{background:var(--acc);border-color:var(--acc);color:var(--surface)}
+.barrier.dim{opacity:.4}
+
+.answer{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.ans{background:var(--acc-soft);border-radius:14px;padding:16px 18px;min-width:0}
+.ans h3{margin:0 0 6px;font-family:var(--display);font-weight:800;font-size:.85rem;text-transform:uppercase;letter-spacing:.08em;color:var(--acc)}
+.ans p{margin:0;font-size:1.15rem}
+.ans .big{font-family:var(--display);font-weight:800;font-size:1.6rem;line-height:1.15}
+.ans ul{margin:0;padding-left:1.1em;display:grid;gap:4px;font-size:1.1rem}
+
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn{border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:11px 18px;font-weight:700}
+.btn:hover{border-color:var(--acc)}
+.btn.primary{background:var(--acc);border-color:var(--acc);color:var(--surface)}
+.btn:disabled{opacity:.4;cursor:default}
+.spacer{flex:1}
+.hint{color:var(--muted);font-size:.85rem}
+
+.board{display:grid;gap:12px}
+.board-head{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;justify-content:space-between}
+.board-head h2{font-family:var(--display);font-weight:800;font-size:1.4rem;margin:0}
+.teams{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.team{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;display:grid;gap:10px;border-top:6px solid var(--tc);min-width:0}
+.team.lead .score::after{content:" ★";font-size:1.2rem;color:var(--t5)}
+.team input{font:inherit;font-weight:700;border:0;border-bottom:1.5px dashed var(--line);background:transparent;color:var(--ink);padding:2px 0;width:100%;min-width:0}
+.score{font-family:var(--display);font-weight:800;font-size:3rem;line-height:1;color:var(--tc);font-variant-numeric:tabular-nums}
+.pts{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.pt{border:1.5px solid var(--tc);background:transparent;border-radius:10px;padding:8px 6px;font-weight:700;font-size:.88rem;line-height:1.2}
+.pt:hover{background:var(--tc);color:var(--surface)}
+.pt.minus{grid-column:1/-1;border-color:var(--line);color:var(--muted);font-size:.8rem;padding:4px}
+.pt.minus:hover{background:var(--soft);color:var(--ink)}
+.pop{animation:pop .35s ease}
+@keyframes pop{40%{transform:scale(1.18)}}
+
+.defs{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:6px 18px}
+.defs summary{cursor:pointer;font-family:var(--display);font-weight:800;font-size:1.1rem;padding:10px 0}
+.defs dl{display:grid;grid-template-columns:minmax(140px,max-content) 1fr;gap:8px 18px;margin:4px 0 16px}
+.defs dt{font-weight:700;color:var(--ntb)}
+.defs dd{margin:0;min-width:0}
+@media (max-width:560px){.defs dl{grid-template-columns:1fr}.defs dd{margin-bottom:6px}.prompt{min-height:0}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" id="tab-sib" aria-selected="true" data-game="sib">Say It Better!</button>
+      <button class="tab" role="tab" id="tab-ntb" aria-selected="false" data-game="ntb">Name That Barrier!</button>
+    </div>
+    <div class="meta" id="meta">Slides 5–7 · 10 minutes · Teams</div>
+  </header>
+
+  <section class="stage" id="stage" aria-live="polite">
+    <div class="top">
+      <div><div class="kicker" id="kicker"></div><div class="count" id="count"></div></div>
+      <div class="timer">
+        <button class="chip" data-sec="30" id="t30">30s</button>
+        <button class="chip on" data-sec="60" id="t60">60s</button>
+        <button class="chip" data-sec="90" id="t90">90s</button>
+        <span class="clock" id="clock">1:00</span>
+        <button class="btn" id="go">Start</button>
+      </div>
+    </div>
+    <p class="task" id="task"></p>
+    <p class="prompt" id="prompt"></p>
+    <div class="barriers" id="barriers" hidden></div>
+    <div class="answer" id="answer" hidden></div>
+    <div class="controls">
+      <button class="btn" id="prev">← Back</button>
+      <button class="btn primary" id="reveal">Reveal answer</button>
+      <button class="btn" id="next">Next →</button>
+      <span class="spacer"></span>
+      <span class="hint">Keys: ← → to move · Space to reveal · T for timer</span>
+    </div>
+  </section>
+
+  <section class="board">
+    <div class="board-head">
+      <h2>Scoreboard</h2>
+      <div class="controls">
+        <button class="btn" id="addTeam">Add team</button>
+        <button class="btn" id="remTeam">Remove team</button>
+        <button class="btn" id="resetAsk">Reset scores</button>
+        <span id="resetConfirm" hidden><button class="btn primary" id="resetYes">Yes, reset to 0</button> <button class="btn" id="resetNo">Cancel</button></span>
+      </div>
+    </div>
+    <div class="teams" id="teams"></div>
+  </section>
+
+  <details class="defs" id="defs">
+    <summary>The seven barriers (teacher reference)</summary>
+    <dl id="deflist"></dl>
+  </details>
+</div>
+
+<script>
+const SIB = [
+  {slide:5, q:"You're too young to understand how this works.",
+   problem:["Age bias: dismisses someone because of their age, not their ability.","Shuts down questions and makes a new worker feel they don't belong."],
+   better:"Let me walk you through how this works. Ask me anything as we go."},
+  {slide:5, q:"Your English is pretty good for someone new here.",
+   problem:["A backhanded compliment built on a stereotype about newcomers.","Treats the person as an outsider instead of a coworker."],
+   better:"Thanks for explaining that so clearly in the meeting."},
+  {slide:5, q:"We need someone more energetic for this job.",
+   problem:["Coded language that screens out older workers or people with disabilities.","Describes a person instead of the job's real requirements."],
+   better:"This job needs someone who can work 10-hour shifts and lift up to 50 lb."},
+  {slide:6, q:"Can you get one of the guys to help you lift that?",
+   problem:["Gender stereotype: assumes a woman can't do physical work.","Undermines her skill in front of the team."],
+   better:"Do you want a hand or a dolly for that?"},
+  {slide:6, q:"Where are you really from?",
+   problem:["Signals the person isn't seen as truly Canadian.","Focuses on background instead of the person's work."],
+   better:"Where did you work before you joined us?"},
+  {slide:6, q:"Ugh, that's so gay.",
+   problem:["Uses an identity as an insult.","Creates an unsafe space for 2SLGBTQ+ coworkers, out or not."],
+   better:"Ugh, that's so frustrating."},
+  {slide:7, q:"She probably won't want the promotion now that she has kids.",
+   problem:["Assumes what a parent, usually a mother, wants or can handle.","Can lead to family-status discrimination in promotions."],
+   better:"Let's ask her if she's interested in the promotion."},
+  {slide:7, q:"I don't see colour. I treat everyone exactly the same.",
+   problem:["Dismisses the real experiences of racialized coworkers.","Treating everyone the same isn't always fair; equity can need different supports."],
+   better:"I want to understand how your experience here might be different from mine."},
+  {slide:7, q:"You don't look disabled.",
+   problem:["Invalidates invisible disabilities.","Puts the person on the spot to prove their need."],
+   better:"Thanks for letting me know. What would help you do your best work?"}
+];
+
+const BARRIERS = [
+  ["Prejudice","A negative attitude or feeling about a group, formed without real knowledge. It's in the head; no action yet."],
+  ["Ethnocentrism","Judging other cultures by your own, and believing your culture's way is the normal or right way."],
+  ["Stereotyping","Assuming everyone in a group has the same traits or abilities."],
+  ["Blaming the victim","Holding the person who was mistreated responsible for what happened to them."],
+  ["Discrimination","Acting on prejudice: treating someone unfairly in hiring, pay, promotion or duties because of a personal characteristic."],
+  ["Harassment","Unwelcome comments or conduct, often repeated, that demean or humiliate someone."],
+  ["Backlash","Resentment or resistance from others when an organization makes efforts to include or accommodate a group."]
+];
+
+const NTB = [
+  {q:"A supervisor refuses to interview a qualified applicant because they believe older workers struggle with technology.",
+   a:"Discrimination", also:"influenced by age stereotyping",
+   why:"The supervisor acted on a belief about age and denied a real opportunity, the interview."},
+  {q:"A manager tells a newcomer that her direct way of giving feedback is rude and that she needs to learn “the proper Canadian way” of doing things.",
+   a:"Ethnocentrism",
+   why:"The manager treats his own culture's style as the correct one and judges hers against it."},
+  {q:"A team lead automatically asks the only woman on the crew to take notes and order lunch for the meeting.",
+   a:"Stereotyping",
+   why:"He assumes she suits admin and caregiving tasks because she's a woman."},
+  {q:"An employee reports repeated jokes about her hijab. Her manager says, “If you didn't make such a big deal of it, they'd stop.”",
+   a:"Blaming the victim",
+   why:"The manager makes the person being targeted responsible for the behaviour instead of the people doing it."},
+  {q:"Every day a coworker imitates a colleague's accent in front of others and keeps doing it after being asked to stop.",
+   a:"Harassment",
+   why:"Repeated, unwelcome conduct that humiliates him, tied to his ethnic origin."},
+  {q:"After the company launches a mentorship program for Indigenous employees, several staff complain it's “reverse discrimination” and stop attending team events.",
+   a:"Backlash",
+   why:"Others resent and resist an effort to support an under-represented group."},
+  {q:"Before even meeting the new hire, a worker says, “I already don't like him. People from that part of town are trouble.”",
+   a:"Prejudice",
+   why:"A negative attitude formed without knowing him. He hasn't acted on it yet."},
+  {q:"A restaurant only schedules its youngest, slimmest servers on the busy, high-tip Friday night shift.",
+   a:"Discrimination", also:"based on age and appearance",
+   why:"Shifts and income are handed out unequally because of personal characteristics, not skill."},
+  {q:"“He's gay, so he'll be great at decorating the office for the holiday party.”",
+   a:"Stereotyping",
+   why:"Assigns an interest or talent to someone based only on his sexual orientation."},
+  {q:"An employee who uses a wheelchair asks for a ramp at the side door. Her boss replies, “You knew this building had stairs when you took the job.”",
+   a:"Blaming the victim", also:"may also lead to discrimination (failure to accommodate)",
+   why:"The boss makes her responsible for a barrier the employer has a duty to remove."},
+  {q:"At the team potluck, a coworker calls a colleague's dish “weird-smelling” and says next time everyone should just bring “normal” food.",
+   a:"Ethnocentrism",
+   why:"Treats his own culture's food as the normal standard and others' as strange."},
+  {q:"A supervisor keeps commenting on a young employee's body and texts her late at night even though she never responds.",
+   a:"Harassment", also:"sexual harassment, with a power imbalance",
+   why:"Unwelcome, repeated sexual attention from someone with power over her job."},
+  {q:"When a coworker is given Friday afternoons for prayer and makes up the hours on Saturday, others grumble, “Why does he get special treatment?”",
+   a:"Backlash",
+   why:"Resentment aimed at a religious accommodation the employer is required to provide."}
+];
+
+const TEAM_COLORS=["--t1","--t2","--t3","--t4","--t5","--t6"];
+const S = {game:"sib", i:{sib:0,ntb:0}, shown:false, teams:[], sec:60, left:60, running:false};
+const store = {get(){try{return JSON.parse(localStorage.getItem("raw-games")||"null")}catch(e){return null}},
+  set(){try{localStorage.setItem("raw-games",JSON.stringify({teams:S.teams,i:S.i,game:S.game}))}catch(e){}}};
+let timerId=null;
+const $=id=>document.getElementById(id);
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function defaultTeams(){return ["Team 1","Team 2","Team 3","Team 4"].map(n=>({name:n,score:0}))}
+
+function render(){
+  const g=S.game, list=g==="sib"?SIB:NTB, i=S.i[g], item=list[i];
+  document.body.className=g;
+  document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",t.dataset.game===g));
+  $("meta").textContent = g==="sib" ? "Slides 5–7 · 10 minutes · Teams" : "Slide 10 · 10–15 minutes · Competitive game";
+  $("kicker").textContent = g==="sib" ? `Say It Better! · Slide ${item.slide}` : "Name That Barrier!";
+  $("count").textContent = `${g==="sib"?"Statement":"Situation"} ${i+1} of ${list.length}`;
+  $("task").textContent = g==="sib" ? "What's the problem with this statement? How would you say it better?" : "Which barrier is this? Be ready to explain why.";
+  $("prompt").textContent = item.q;
+  $("prev").disabled = i===0; $("next").disabled = i===list.length-1;
+  $("reveal").textContent = S.shown ? "Hide answer" : "Reveal answer";
+
+  const bar=$("barriers");
+  bar.hidden = g!=="ntb";
+  if(g==="ntb"){
+    bar.innerHTML = BARRIERS.map(([n])=>`<span class="barrier ${S.shown?(n===item.a?"hit":"dim"):""}">${n}</span>`).join("");
+  }
+  const ans=$("answer");
+  ans.hidden=!S.shown;
+  if(g==="sib"){
+    ans.innerHTML = `<div class="ans"><h3>The problem · 1 point</h3><ul>${item.problem.map(p=>`<li>${esc(p)}</li>`).join("")}</ul></div>
+      <div class="ans"><h3>A better way · 1 point</h3><p class="big">“${esc(item.better)}”</p></div>`;
+  } else {
+    ans.innerHTML = `<div class="ans"><h3>The barrier · 1 point</h3><p class="big">${item.a}</p>${item.also?`<p>${esc(item.also)}</p>`:""}</div>
+      <div class="ans"><h3>Why · 1 point</h3><p>${esc(item.why)}</p></div>`;
+  }
+  renderTeams(); store.set();
+}
+
+function renderTeams(){
+  const g=S.game, labels = g==="sib" ? ["+1 Problem","+1 Better way"] : ["+1 Barrier","+1 Explain"];
+  const max=Math.max(...S.teams.map(t=>t.score));
+  $("teams").innerHTML = S.teams.map((t,k)=>`
+    <div class="team ${max>0&&t.score===max?"lead":""}" style="--tc:var(${TEAM_COLORS[k]})">
+      <input id="team-name-${k}" aria-label="Team ${k+1} name" value="${esc(t.name)}" data-k="${k}">
+      <div class="score" id="score-${k}">${t.score}</div>
+      <div class="pts">
+        <button class="pt" data-k="${k}" data-d="1">${labels[0]}</button>
+        <button class="pt" data-k="${k}" data-d="1">${labels[1]}</button>
+        <button class="pt minus" data-k="${k}" data-d="-1">Undo 1 point</button>
+      </div>
+    </div>`).join("");
+  $("addTeam").disabled = S.teams.length>=6; $("remTeam").disabled = S.teams.length<=2;
+}
+
+$("teams").addEventListener("click",e=>{
+  const b=e.target.closest(".pt"); if(!b) return;
+  const t=S.teams[+b.dataset.k]; t.score=Math.max(0,t.score+ +b.dataset.d);
+  renderTeams(); store.set();
+  if(+b.dataset.d>0){const el=$("score-"+b.dataset.k); el.classList.add("pop");}
+});
+$("teams").addEventListener("input",e=>{ if(e.target.dataset.k!=null){S.teams[+e.target.dataset.k].name=e.target.value; store.set();} });
+
+function go(d){const list=S.game==="sib"?SIB:NTB; const n=S.i[S.game]+d; if(n<0||n>=list.length) return; S.i[S.game]=n; S.shown=false; resetTimer(); render();}
+$("prev").onclick=()=>go(-1); $("next").onclick=()=>go(1);
+$("reveal").onclick=()=>{S.shown=!S.shown; if(S.shown) stopTimer(); render();};
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{S.game=t.dataset.game; S.shown=false; resetTimer(); render();});
+
+$("addTeam").onclick=()=>{if(S.teams.length<6){S.teams.push({name:`Team ${S.teams.length+1}`,score:0}); renderTeams(); store.set();}};
+$("remTeam").onclick=()=>{if(S.teams.length>2){S.teams.pop(); renderTeams(); store.set();}};
+$("resetAsk").onclick=()=>{$("resetAsk").hidden=true; $("resetConfirm").hidden=false;};
+$("resetNo").onclick=()=>{$("resetAsk").hidden=false; $("resetConfirm").hidden=true;};
+$("resetYes").onclick=()=>{S.teams.forEach(t=>t.score=0); $("resetNo").onclick(); renderTeams(); store.set();};
+
+/* Timer */
+function fmt(s){return `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`}
+function drawClock(){const c=$("clock"); c.textContent=fmt(S.left); c.classList.toggle("low",S.left<=10&&S.left>0); c.classList.toggle("done",S.left===0); $("go").textContent=S.running?"Pause":(S.left===0?"Restart":"Start");}
+function stopTimer(){clearInterval(timerId); S.running=false; drawClock();}
+function resetTimer(){stopTimer(); S.left=S.sec; drawClock();}
+function toggleTimer(){
+  if(S.running){stopTimer(); return;}
+  if(S.left===0) S.left=S.sec;
+  S.running=true; drawClock();
+  timerId=setInterval(()=>{S.left--; if(S.left<=0){S.left=0; stopTimer(); beep();} drawClock();},1000);
+}
+function beep(){try{const a=new (window.AudioContext||window.webkitAudioContext)(); const o=a.createOscillator(), g=a.createGain(); o.frequency.value=660; o.connect(g); g.connect(a.destination); g.gain.setValueAtTime(.2,a.currentTime); g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.8); o.start(); o.stop(a.currentTime+.8);}catch(e){}}
+$("go").onclick=toggleTimer;
+document.querySelectorAll("[data-sec]").forEach(b=>b.onclick=()=>{S.sec=+b.dataset.sec; document.querySelectorAll("[data-sec]").forEach(x=>x.classList.toggle("on",x===b)); resetTimer();});
+
+document.addEventListener("keydown",e=>{
+  if(e.target.tagName==="INPUT") return;
+  if(e.key==="ArrowRight") go(1);
+  else if(e.key==="ArrowLeft") go(-1);
+  else if(e.key===" "){e.preventDefault(); $("reveal").click();}
+  else if(e.key.toLowerCase()==="t") toggleTimer();
+});
+
+$("deflist").innerHTML = BARRIERS.map(([n,d])=>`<dt>${n}</dt><dd>${d}</dd>`).join("");
+
+function start(data){
+  const saved = (data && data.teams) ? data : store.get();
+  S.teams = saved && Array.isArray(saved.teams) && saved.teams.length>=2 ? saved.teams : defaultTeams();
+  if(saved && saved.i) S.i = {sib:Math.min(saved.i.sib||0,SIB.length-1), ntb:Math.min(saved.i.ntb||0,NTB.length-1)};
+  if(saved && (saved.game==="sib"||saved.game==="ntb")) S.game=saved.game;
+  drawClock(); render();
+}
+window.claude?.hot?.snapshot?.(()=>({teams:S.teams,i:S.i,game:S.game}));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
+</body>
+</html>
