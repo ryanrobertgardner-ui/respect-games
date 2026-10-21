@@ -6,22 +6,24 @@
 <title>Respect at Work Games</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
 <style>
-/* Layout: projector stage. Game switch on top, one big card in the middle, team scoreboard docked beneath. */
+/* Layout: projector stage. Game switch on top, one big card in the middle, team scoreboard docked beneath. Each game has its own accent. */
 :root{
   --bg:#e9eef2; --surface:#ffffff; --ink:#14212b; --muted:#56646f; --line:#cdd6dd; --soft:#dfe6eb;
   --sib:#0d7a70; --sib-soft:#d5efeb;      /* Say It Better */
   --ntb:#c4461d; --ntb-soft:#f8e1d7;      /* Name That Barrier */
+  --gen:#6b46b8; --gen-soft:#e8e0f7;      /* Generation Gap */
+  --det:#2350b8; --det-soft:#dde6fa;      /* Diversity Detective */
   --good:#1d7a45; --t1:#2f5bd3; --t2:#c4461d; --t3:#0d7a70; --t4:#8a3fb5; --t5:#b7860b; --t6:#c02c62;
   --display:"Bricolage Grotesque","Arial Narrow",Arial,sans-serif;
   --body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#0f161c; --surface:#18222b; --ink:#e7eef3; --muted:#9aa9b5; --line:#2c3a46; --soft:#22303b;
-  --sib:#3cc1b2; --sib-soft:#123631; --ntb:#f07a52; --ntb-soft:#3b2017; --good:#4cc47f;
+  --sib:#3cc1b2; --sib-soft:#123631; --ntb:#f07a52; --ntb-soft:#3b2017; --gen:#b49af0; --gen-soft:#2a2240; --det:#86a6f5; --det-soft:#1a2747; --good:#4cc47f;
   --t1:#7d9cf2; --t2:#f07a52; --t3:#3cc1b2; --t4:#c08ae6; --t5:#e2b33c; --t6:#ef6f9b; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0f161c; --surface:#18222b; --ink:#e7eef3; --muted:#9aa9b5; --line:#2c3a46; --soft:#22303b;
-  --sib:#3cc1b2; --sib-soft:#123631; --ntb:#f07a52; --ntb-soft:#3b2017; --good:#4cc47f;
+  --sib:#3cc1b2; --sib-soft:#123631; --ntb:#f07a52; --ntb-soft:#3b2017; --gen:#b49af0; --gen-soft:#2a2240; --det:#86a6f5; --det-soft:#1a2747; --good:#4cc47f;
   --t1:#7d9cf2; --t2:#f07a52; --t3:#3cc1b2; --t4:#c08ae6; --t5:#e2b33c; --t6:#ef6f9b; color-scheme:dark}
 
 *{box-sizing:border-box}
@@ -33,10 +35,12 @@ button{font:inherit;color:inherit;cursor:pointer}
 button:focus-visible,input:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
 body{--acc:var(--sib);--acc-soft:var(--sib-soft)}
 body.ntb{--acc:var(--ntb);--acc-soft:var(--ntb-soft)}
+body.gen{--acc:var(--gen);--acc-soft:var(--gen-soft)}
+body.det{--acc:var(--det);--acc-soft:var(--det-soft)}
 
 header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
 .tabs{display:flex;gap:6px;background:var(--soft);padding:5px;border-radius:14px;flex-wrap:wrap}
-.tab{border:0;background:transparent;padding:10px 18px;border-radius:10px;font-family:var(--display);font-weight:800;font-size:1.05rem;color:var(--muted)}
+.tab{border:0;background:transparent;padding:10px 16px;border-radius:10px;font-family:var(--display);font-weight:800;font-size:1.02rem;color:var(--muted)}
 .tab[aria-selected="true"]{background:var(--surface);color:var(--acc);box-shadow:0 1px 3px rgb(0 0 0/.12)}
 .meta{color:var(--muted);font-size:.95rem}
 
@@ -45,14 +49,13 @@ header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-betw
 .top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
 .kicker{font-family:var(--display);font-weight:800;text-transform:uppercase;letter-spacing:.08em;font-size:.85rem;color:var(--acc)}
 .count{font-variant-numeric:tabular-nums;color:var(--muted);font-weight:700}
-h1.title{font-family:var(--display);font-weight:800;font-size:clamp(2rem,4.6vw,3.4rem);line-height:1;margin:0;text-wrap:balance}
 .prompt{font-family:var(--display);font-weight:600;font-size:clamp(1.5rem,3.6vw,2.6rem);line-height:1.2;margin:0;text-wrap:balance;min-height:2.4em}
 .sib .prompt::before{content:"“";color:var(--acc);margin-right:.08em}
 .sib .prompt::after{content:"”";color:var(--acc);margin-left:.04em}
 .task{font-size:1.1rem;color:var(--muted);margin:0}
 
-.timer{display:flex;align-items:center;gap:8px}
-.clock{font-family:var(--display);font-weight:800;font-size:1.9rem;font-variant-numeric:tabular-nums;min-width:3.2ch;text-align:right}
+.timer{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.clock{font-family:var(--display);font-weight:800;font-size:1.9rem;font-variant-numeric:tabular-nums;min-width:3.4ch;text-align:right}
 .clock.low{color:var(--ntb)}
 .clock.done{color:var(--ntb);animation:blink 1s steps(2) infinite}
 @keyframes blink{50%{opacity:.25}}
@@ -64,12 +67,43 @@ h1.title{font-family:var(--display);font-weight:800;font-size:clamp(2rem,4.6vw,3
 .barrier.hit{background:var(--acc);border-color:var(--acc);color:var(--surface)}
 .barrier.dim{opacity:.4}
 
+/* Shared body pieces for the case-based games */
+.body{display:grid;gap:18px}
+.lead-in{font-size:1.25rem;margin:0;max-width:62ch}
+h2.big{font-family:var(--display);font-weight:800;font-size:clamp(1.6rem,3.4vw,2.4rem);line-height:1.1;margin:0;text-wrap:balance}
+.callout{background:var(--acc-soft);border-radius:16px;padding:18px 22px;font-size:1.25rem}
+.callout strong{color:var(--acc)}
+.gens{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.gen-col{display:grid;gap:10px;align-content:start}
+.gen-col h3{margin:0;font-family:var(--display);font-weight:800;font-size:1.15rem;color:var(--acc)}
+.gen-col h3 span{display:block;font-family:var(--body);font-weight:400;font-size:.85rem;color:var(--muted)}
+.person{background:var(--bg);border-radius:12px;padding:12px 14px;display:grid;gap:3px}
+.person b{font-family:var(--display);font-size:1.15rem}
+.person i{font-style:normal;color:var(--muted);font-size:.92rem}
+.person p{margin:0;font-size:.98rem}
+.checklist{margin:0;padding-left:1.2em;display:grid;gap:6px;font-size:1.15rem}
+.two{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.exhibit{border:1.5px solid var(--line);border-radius:16px;padding:16px 18px;display:grid;gap:8px;align-content:start;min-width:0}
+.exhibit h3{margin:0;font-family:var(--display);font-weight:800;font-size:.85rem;text-transform:uppercase;letter-spacing:.08em;color:var(--acc)}
+.exhibit p{margin:0;font-size:1.08rem}
+.report{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.report div{background:var(--bg);border-radius:12px;padding:14px 16px}
+.report b{display:block;font-family:var(--display);font-size:1.15rem;color:var(--acc)}
+
 .answer{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
 .ans{background:var(--acc-soft);border-radius:14px;padding:16px 18px;min-width:0}
 .ans h3{margin:0 0 6px;font-family:var(--display);font-weight:800;font-size:.85rem;text-transform:uppercase;letter-spacing:.08em;color:var(--acc)}
 .ans p{margin:0;font-size:1.15rem}
 .ans .big{font-family:var(--display);font-weight:800;font-size:1.6rem;line-height:1.15}
 .ans ul{margin:0;padding-left:1.1em;display:grid;gap:4px;font-size:1.1rem}
+.ans.wide{grid-column:1/-1}
+.key{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.key div{background:var(--surface);border-radius:10px;padding:12px 14px;display:grid;gap:4px}
+.key b{font-family:var(--display);font-size:1.08rem}
+.key .tag{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--acc)}
+.key .why{color:var(--muted);font-size:.95rem}
+.key .fix{font-size:.98rem}
+.key .fix::before{content:"Fix: ";font-weight:700}
 
 .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 .btn{border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:11px 18px;font-weight:700}
@@ -82,15 +116,15 @@ h1.title{font-family:var(--display);font-weight:800;font-size:clamp(2rem,4.6vw,3
 .board{display:grid;gap:12px}
 .board-head{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;justify-content:space-between}
 .board-head h2{font-family:var(--display);font-weight:800;font-size:1.4rem;margin:0}
-.teams{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
-.team{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;display:grid;gap:10px;border-top:6px solid var(--tc);min-width:0}
+.teams{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.team{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;display:grid;gap:10px;border-top:6px solid var(--tc);min-width:0;align-content:start}
 .team.lead .score::after{content:" ★";font-size:1.2rem;color:var(--t5)}
 .team input{font:inherit;font-weight:700;border:0;border-bottom:1.5px dashed var(--line);background:transparent;color:var(--ink);padding:2px 0;width:100%;min-width:0}
 .score{font-family:var(--display);font-weight:800;font-size:3rem;line-height:1;color:var(--tc);font-variant-numeric:tabular-nums}
-.pts{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.pt{border:1.5px solid var(--tc);background:transparent;border-radius:10px;padding:8px 6px;font-weight:700;font-size:.88rem;line-height:1.2}
+.pts{display:flex;flex-wrap:wrap;gap:6px}
+.pt{flex:1 1 40%;border:1.5px solid var(--tc);background:transparent;border-radius:10px;padding:8px 6px;font-weight:700;font-size:.86rem;line-height:1.2}
 .pt:hover{background:var(--tc);color:var(--surface)}
-.pt.minus{grid-column:1/-1;border-color:var(--line);color:var(--muted);font-size:.8rem;padding:4px}
+.pt.minus{flex-basis:100%;border-color:var(--line);color:var(--muted);font-size:.8rem;padding:4px}
 .pt.minus:hover{background:var(--soft);color:var(--ink)}
 .pop{animation:pop .35s ease}
 @keyframes pop{40%{transform:scale(1.18)}}
@@ -111,23 +145,24 @@ h1.title{font-family:var(--display);font-weight:800;font-size:clamp(2rem,4.6vw,3
     <div class="tabs" role="tablist">
       <button class="tab" role="tab" id="tab-sib" aria-selected="true" data-game="sib">Say It Better!</button>
       <button class="tab" role="tab" id="tab-ntb" aria-selected="false" data-game="ntb">Name That Barrier!</button>
+      <button class="tab" role="tab" id="tab-gen" aria-selected="false" data-game="gen">Generation Gap Challenge</button>
+      <button class="tab" role="tab" id="tab-det" aria-selected="false" data-game="det">Diversity Detective</button>
     </div>
-    <div class="meta" id="meta">Slides 5–7 · 10 minutes · Teams</div>
+    <div class="meta" id="meta"></div>
   </header>
 
   <section class="stage" id="stage" aria-live="polite">
     <div class="top">
       <div><div class="kicker" id="kicker"></div><div class="count" id="count"></div></div>
       <div class="timer">
-        <button class="chip" data-sec="30" id="t30">30s</button>
-        <button class="chip on" data-sec="60" id="t60">60s</button>
-        <button class="chip" data-sec="90" id="t90">90s</button>
+        <span id="chips" class="timer"></span>
         <span class="clock" id="clock">1:00</span>
         <button class="btn" id="go">Start</button>
       </div>
     </div>
     <p class="task" id="task"></p>
     <p class="prompt" id="prompt"></p>
+    <div class="body" id="body" hidden></div>
     <div class="barriers" id="barriers" hidden></div>
     <div class="answer" id="answer" hidden></div>
     <div class="controls">
@@ -241,73 +276,194 @@ const NTB = [
    why:"Resentment aimed at a religious accommodation the employer is required to provide."}
 ];
 
+/* ---------- Generation Gap Challenge ---------- */
+const STAFF = [
+  {gen:"Baby Boomers", years:"born 1946–1964", people:[
+    ["Linda, 62","Store manager","Runs inventory on a tablet every day. Wants training that respects her time."],
+    ["Don, 66","Part-time sales, Saturdays","Hard of hearing in one ear. Prefers a phone call to a text."]]},
+  {gen:"Generation X", years:"born 1965–1980", people:[
+    ["Marcus, 52","Receiving lead, 6 a.m. shifts","Rarely checks work email. Learns best by doing."],
+    ["Priya, 47","HR and payroll","Makes the paper schedule now. Worried about mistakes during the switch."]]},
+  {gen:"Millennials", years:"born 1981–1996", people:[
+    ["Jordan, 36","Assistant manager","Takes evening college classes. Wants everything on his phone."],
+    ["Aiyana, 30","Cashier","Single parent. Needs to know her shifts at least two weeks ahead."]]},
+  {gen:"Generation Z", years:"born 1997–2012", people:[
+    ["Tyler, 19","Stock clerk","Has never used a work app. Skips long written instructions."],
+    ["Mei, 24","Garden centre","New to Canada. English is her second language. Very confident with tech."]]}
+];
+const GEN = [
+  {page:"The workplace", task:"Meet the team. Notice what each person actually needs.", noAnswer:true},
+  {page:"The twist", task:"Plan your strategy, then pitch it in 60 seconds."}
+];
+
+/* ---------- Diversity Detective ---------- */
+const EXHIBITS = [
+  ["Exhibit A · Hiring","The posting for a new Shift Supervisor asks for “a young, energetic go-getter” who is a “native English speaker.” Hiring manager Greg sets aside an application from Oluwaseun Adeyemi because “customers won't be able to say that name.” In one interview, Greg asks Sarah whether she plans to start a family soon."],
+  ["Exhibit B · Communication","Safety updates go out only as long emails in English, but half the warehouse staff don't have work email. The 7:30 a.m. team meeting has no captions or interpreter, even though Dana, a forklift operator, is Deaf. Greg opens every meeting with “Morning, guys!”"],
+  ["Exhibit C · Employee conflict","Ravi, who is Sikh and wears a turban, is called nicknames by two coworkers. When he complains, HR tells him it's just banter and he shouldn't be so sensitive. After the company opens a quiet room for prayer and reflection, several staff complain about “special treatment” and stop coming to the staff barbecue."],
+  ["Exhibit D · Generational differences","Kayla, 22, suggests tracking inventory with a scanner app. Her 58-year-old supervisor replies, “You've been here five minutes.” Meanwhile, younger drivers call Frank, 61, “Boomer” and leave him out of the group chat where shift swaps happen, so he keeps missing extra shifts."]
+];
+const KEY = [
+  ["A","Age-coded job posting","“Young, energetic” screens out older applicants. Age discrimination.","List the real job requirements and review every posting for biased words."],
+  ["A","“Native English speaker”","Excludes people based on place of origin, not ability.","Ask for the communication skills the job actually needs."],
+  ["A","Rejecting an applicant because of his name","Discrimination based on ethnic origin, driven by a stereotype.","Screen applications with names hidden and use a scored interview panel."],
+  ["A","Asking Sarah about starting a family","Family status and sex are protected. Human rights laws don't allow this question.","Ask every candidate the same job-related questions. Train interviewers."],
+  ["B","Safety updates by English email only","Staff without email or strong English miss safety information.","Use shift huddles, picture-based posters, text alerts and translated summaries."],
+  ["B","No captions or interpreter for Dana","The employer has a duty to accommodate a disability.","Book an ASL interpreter or live captions, and share a written agenda."],
+  ["B","“Morning, guys!”","Gendered language leaves people out.","Say “Morning, everyone” or “Morning, team.”"],
+  ["C","Nicknames aimed at Ravi","Harassment based on religion and appearance.","Enforce the harassment policy: investigate, and set clear consequences."],
+  ["C","HR calls it “just banter”","Blaming the victim. It discourages anyone else from reporting.","Take every complaint seriously and train HR on handling reports."],
+  ["C","Complaints about the quiet room","Backlash against a religious accommodation.","Leaders explain why it's required and open the room to anyone needing quiet time."],
+  ["D","Kayla's idea dismissed","Age stereotyping. A good idea is lost.","Judge ideas on merit, try a small pilot, and set up two-way mentoring."],
+  ["D","Frank left out of the group chat","Age-based exclusion that costs him income.","Post shift swaps in an official channel everyone can use, and set respect expectations."]
+];
+const DET = [
+  {page:"The case", task:"Read the case file for Kestrel Logistics, a warehouse and delivery company with 120 staff.", noAnswer:true},
+  {page:"Your report", task:"Write up your findings, then share them with the class."}
+];
+
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+const GAMES = {
+  sib:{list:SIB, meta:"Slides 5–7 · 10 minutes · Teams", unit:"Statement", timers:[30,60,90], def:60,
+    labels:["+1 Problem","+1 Better way"],
+    kicker:it=>`Say It Better! · Slide ${it.slide}`,
+    task:()=>"What's the problem with this statement? How would you say it better?",
+    answer:it=>`<div class="ans"><h3>The problem · 1 point</h3><ul>${it.problem.map(p=>`<li>${esc(p)}</li>`).join("")}</ul></div>
+      <div class="ans"><h3>A better way · 1 point</h3><p class="big">“${esc(it.better)}”</p></div>`},
+  ntb:{list:NTB, meta:"Slide 10 · 10–15 minutes · Competitive game", unit:"Situation", timers:[30,60,90], def:60,
+    labels:["+1 Barrier","+1 Explain"],
+    kicker:()=>"Name That Barrier!",
+    task:()=>"Which barrier is this? Be ready to explain why.",
+    answer:it=>`<div class="ans"><h3>The barrier · 1 point</h3><p class="big">${it.a}</p>${it.also?`<p>${esc(it.also)}</p>`:""}</div>
+      <div class="ans"><h3>Why · 1 point</h3><p>${esc(it.why)}</p></div>`},
+  gen:{list:GEN, meta:"Slide 13 · 10–15 minutes · Groups", unit:"Part", timers:[60,300,480], def:480,
+    labels:["+1 Works for everyone","+1 No age assumptions","+1 Clear pitch"],
+    kicker:it=>`Generation Gap Challenge · ${it.page}`,
+    task:it=>it.task,
+    body:(it,i)=> i===0 ? `
+      <p class="lead-in">Your group runs training at <b>Northgate Home &amp; Farm Supply</b>, a busy hardware and farm store with 38 staff from four generations. Here are eight of them.</p>
+      <div class="gens">${STAFF.map(g=>`<div class="gen-col"><h3>${g.gen}<span>${g.years}</span></h3>
+        ${g.people.map(p=>`<div class="person"><b>${p[0]}</b><i>${p[1]}</i><p>${esc(p[2])}</p></div>`).join("")}</div>`).join("")}</div>
+      <div class="callout"><strong>How things work now:</strong> the schedule is printed and posted in the break room every Friday. Shift swaps happen in a group text that not everyone is in.</div>`
+      : `
+      <div class="callout"><strong>The twist:</strong> in three weeks, Northgate switches to <b>ShiftLink</b>, a scheduling app. Shifts, swaps and time-off requests will all happen in the app, on a phone or the store computer. The paper schedule goes away.</div>
+      <h2 class="big">How will you train all 38 staff without making assumptions based on age?</h2>
+      <div class="two">
+        <div class="exhibit"><h3>Your plan must cover</h3><ul class="checklist">
+          <li>How you'll find out what each person needs, instead of guessing</li>
+          <li>At least two ways to train people</li>
+          <li>How you'll announce the change and the deadline</li>
+          <li>Support during the first few weeks</li>
+          <li>How you'll know it worked</li></ul></div>
+        <div class="exhibit"><h3>The pitch</h3><p>Each group gets <b>60 seconds</b>. Use the 60s timer above. When it hits zero, the pitch is over.</p>
+          <p>Points: 1 for a plan that works for everyone, 1 for avoiding age assumptions, 1 for a clear pitch.</p></div>
+      </div>`,
+    answer:()=>`<div class="ans"><h3>What strong plans include</h3><ul>
+        <li><b>Ask first:</b> a quick survey or chat about skills and preferences, so training is based on need, not age.</li>
+        <li><b>Several formats:</b> short hands-on sessions, a 3-minute video and a printed step-by-step guide with screenshots.</li>
+        <li><b>Paid training time on every shift</b>, including 6 a.m. and Saturdays.</li>
+        <li><b>Mixed-age “app champions”</b> who help coworkers. Learning goes both ways.</li>
+        <li><b>Accessibility:</b> large print, captions, plain language and a translated quick guide.</li>
+        <li><b>Overlap:</b> paper schedule and app side by side for two weeks.</li>
+        <li><b>Check in after two weeks</b> to see who still needs help.</li></ul></div>
+      <div class="ans"><h3>Assumptions to avoid</h3><ul>
+        <li>“The older staff will hate it.”</li>
+        <li>“The young ones already know how to use it.”</li>
+        <li>Splitting training groups by age.</li>
+        <li>Only announcing it by email.</li></ul>
+        <h3 style="margin-top:14px">Look at the team again</h3>
+        <p>Linda, 62, is one of the most tech-confident people in the store. Tyler, 19, has never used a work app.</p></div>`},
+  det:{list:DET, meta:"Slides 2–13 · 15–20 minutes · Teams", unit:"Part", timers:[300,600,900], def:600,
+    labels:["+1 Issue found","+1 Strong reasoning","+1 Realistic solution"],
+    kicker:it=>`Diversity Detective · ${it.page}`,
+    task:it=>it.task,
+    body:(it,i)=> i===0 ? `
+      <p class="lead-in">Kestrel Logistics is hiring a new shift supervisor, and things aren't going well. Look for anything related to hiring, communication, employee conflict and generational differences.</p>
+      <div class="two">${EXHIBITS.map(e=>`<div class="exhibit"><h3>${e[0]}</h3><p>${esc(e[1])}</p></div>`).join("")}</div>`
+      : `
+      <h2 class="big">Find at least five diversity-related issues and recommend practical solutions.</h2>
+      <div class="report">
+        <div><b>1 · The issue</b>What's happening, and in which exhibit?</div>
+        <div><b>2 · Why it's a problem</b>Name the barrier, right or law involved.</div>
+        <div><b>3 · The fix</b>Something realistic the company could do this month.</div>
+      </div>
+      <div class="callout"><strong>Scoring:</strong> 1 point for each issue correctly identified, 1 for strong reasoning, and 1 for a realistic solution.</div>`,
+    answer:()=>`<div class="ans wide"><h3>Answer key · 12 issues</h3><div class="key">${KEY.map(k=>`<div><span class="tag">Exhibit ${k[0]}</span><b>${esc(k[1])}</b><span class="why">${esc(k[2])}</span><span class="fix">${esc(k[3])}</span></div>`).join("")}</div></div>`}
+};
+
 const TEAM_COLORS=["--t1","--t2","--t3","--t4","--t5","--t6"];
-const S = {game:"sib", i:{sib:0,ntb:0}, shown:false, teams:[], sec:60, left:60, running:false};
+const S = {game:"sib", i:{sib:0,ntb:0,gen:0,det:0}, shown:false, teams:[], sec:60, left:60, running:false};
 const store = {get(){try{return JSON.parse(localStorage.getItem("raw-games")||"null")}catch(e){return null}},
   set(){try{localStorage.setItem("raw-games",JSON.stringify({teams:S.teams,i:S.i,game:S.game}))}catch(e){}}};
 let timerId=null;
 const $=id=>document.getElementById(id);
-const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 function defaultTeams(){return ["Team 1","Team 2","Team 3","Team 4"].map(n=>({name:n,score:0}))}
+function fmt(s){return `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`}
+function chipLabel(s){return s<60?`${s}s`:(s===60?"60s":`${s/60} min`)}
+
+function renderChips(){
+  const G=GAMES[S.game];
+  $("chips").innerHTML = G.timers.map(s=>`<button class="chip ${s===S.sec?"on":""}" data-sec="${s}">${chipLabel(s)}</button>`).join("");
+}
 
 function render(){
-  const g=S.game, list=g==="sib"?SIB:NTB, i=S.i[g], item=list[i];
+  const g=S.game, G=GAMES[g], i=S.i[g], item=G.list[i];
   document.body.className=g;
   document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",t.dataset.game===g));
-  $("meta").textContent = g==="sib" ? "Slides 5–7 · 10 minutes · Teams" : "Slide 10 · 10–15 minutes · Competitive game";
-  $("kicker").textContent = g==="sib" ? `Say It Better! · Slide ${item.slide}` : "Name That Barrier!";
-  $("count").textContent = `${g==="sib"?"Statement":"Situation"} ${i+1} of ${list.length}`;
-  $("task").textContent = g==="sib" ? "What's the problem with this statement? How would you say it better?" : "Which barrier is this? Be ready to explain why.";
-  $("prompt").textContent = item.q;
-  $("prev").disabled = i===0; $("next").disabled = i===list.length-1;
-  $("reveal").textContent = S.shown ? "Hide answer" : "Reveal answer";
+  $("meta").textContent=G.meta;
+  $("kicker").textContent=G.kicker(item);
+  $("count").textContent=`${G.unit} ${i+1} of ${G.list.length}`;
+  $("task").textContent=G.task(item);
+
+  const hasBody=!!G.body;
+  $("prompt").hidden=hasBody;
+  $("body").hidden=!hasBody;
+  if(hasBody) $("body").innerHTML=G.body(item,i); else $("prompt").textContent=item.q;
+
+  $("prev").disabled=i===0; $("next").disabled=i===G.list.length-1;
+  $("reveal").hidden=!!item.noAnswer;
+  $("reveal").textContent=S.shown?"Hide answer":(g==="det"?"Reveal answer key":g==="gen"?"Reveal ideas":"Reveal answer");
 
   const bar=$("barriers");
-  bar.hidden = g!=="ntb";
-  if(g==="ntb"){
-    bar.innerHTML = BARRIERS.map(([n])=>`<span class="barrier ${S.shown?(n===item.a?"hit":"dim"):""}">${n}</span>`).join("");
-  }
+  bar.hidden=g!=="ntb";
+  if(g==="ntb") bar.innerHTML=BARRIERS.map(([n])=>`<span class="barrier ${S.shown?(n===item.a?"hit":"dim"):""}">${n}</span>`).join("");
+
   const ans=$("answer");
-  ans.hidden=!S.shown;
-  if(g==="sib"){
-    ans.innerHTML = `<div class="ans"><h3>The problem · 1 point</h3><ul>${item.problem.map(p=>`<li>${esc(p)}</li>`).join("")}</ul></div>
-      <div class="ans"><h3>A better way · 1 point</h3><p class="big">“${esc(item.better)}”</p></div>`;
-  } else {
-    ans.innerHTML = `<div class="ans"><h3>The barrier · 1 point</h3><p class="big">${item.a}</p>${item.also?`<p>${esc(item.also)}</p>`:""}</div>
-      <div class="ans"><h3>Why · 1 point</h3><p>${esc(item.why)}</p></div>`;
-  }
-  renderTeams(); store.set();
+  ans.hidden=!S.shown||!!item.noAnswer;
+  ans.innerHTML=S.shown&&!item.noAnswer?G.answer(item):"";
+  renderChips(); renderTeams(); store.set();
 }
 
 function renderTeams(){
-  const g=S.game, labels = g==="sib" ? ["+1 Problem","+1 Better way"] : ["+1 Barrier","+1 Explain"];
+  const labels=GAMES[S.game].labels;
   const max=Math.max(...S.teams.map(t=>t.score));
-  $("teams").innerHTML = S.teams.map((t,k)=>`
+  $("teams").innerHTML=S.teams.map((t,k)=>`
     <div class="team ${max>0&&t.score===max?"lead":""}" style="--tc:var(${TEAM_COLORS[k]})">
       <input id="team-name-${k}" aria-label="Team ${k+1} name" value="${esc(t.name)}" data-k="${k}">
       <div class="score" id="score-${k}">${t.score}</div>
       <div class="pts">
-        <button class="pt" data-k="${k}" data-d="1">${labels[0]}</button>
-        <button class="pt" data-k="${k}" data-d="1">${labels[1]}</button>
+        ${labels.map(l=>`<button class="pt" data-k="${k}" data-d="1">${l}</button>`).join("")}
         <button class="pt minus" data-k="${k}" data-d="-1">Undo 1 point</button>
       </div>
     </div>`).join("");
-  $("addTeam").disabled = S.teams.length>=6; $("remTeam").disabled = S.teams.length<=2;
+  $("addTeam").disabled=S.teams.length>=6; $("remTeam").disabled=S.teams.length<=2;
 }
 
 $("teams").addEventListener("click",e=>{
   const b=e.target.closest(".pt"); if(!b) return;
   const t=S.teams[+b.dataset.k]; t.score=Math.max(0,t.score+ +b.dataset.d);
   renderTeams(); store.set();
-  if(+b.dataset.d>0){const el=$("score-"+b.dataset.k); el.classList.add("pop");}
+  if(+b.dataset.d>0) $("score-"+b.dataset.k).classList.add("pop");
 });
 $("teams").addEventListener("input",e=>{ if(e.target.dataset.k!=null){S.teams[+e.target.dataset.k].name=e.target.value; store.set();} });
 
-function go(d){const list=S.game==="sib"?SIB:NTB; const n=S.i[S.game]+d; if(n<0||n>=list.length) return; S.i[S.game]=n; S.shown=false; resetTimer(); render();}
+function go(d){const list=GAMES[S.game].list; const n=S.i[S.game]+d; if(n<0||n>=list.length) return; S.i[S.game]=n; S.shown=false; resetTimer(); render();}
 $("prev").onclick=()=>go(-1); $("next").onclick=()=>go(1);
 $("reveal").onclick=()=>{S.shown=!S.shown; if(S.shown) stopTimer(); render();};
-document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{S.game=t.dataset.game; S.shown=false; resetTimer(); render();});
+function switchGame(g){S.game=g; S.shown=false; S.sec=GAMES[g].def; resetTimer(); render();}
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>switchGame(t.dataset.game));
 
 $("addTeam").onclick=()=>{if(S.teams.length<6){S.teams.push({name:`Team ${S.teams.length+1}`,score:0}); renderTeams(); store.set();}};
 $("remTeam").onclick=()=>{if(S.teams.length>2){S.teams.pop(); renderTeams(); store.set();}};
@@ -316,7 +472,6 @@ $("resetNo").onclick=()=>{$("resetAsk").hidden=false; $("resetConfirm").hidden=t
 $("resetYes").onclick=()=>{S.teams.forEach(t=>t.score=0); $("resetNo").onclick(); renderTeams(); store.set();};
 
 /* Timer */
-function fmt(s){return `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`}
 function drawClock(){const c=$("clock"); c.textContent=fmt(S.left); c.classList.toggle("low",S.left<=10&&S.left>0); c.classList.toggle("done",S.left===0); $("go").textContent=S.running?"Pause":(S.left===0?"Restart":"Start");}
 function stopTimer(){clearInterval(timerId); S.running=false; drawClock();}
 function resetTimer(){stopTimer(); S.left=S.sec; drawClock();}
@@ -328,7 +483,7 @@ function toggleTimer(){
 }
 function beep(){try{const a=new (window.AudioContext||window.webkitAudioContext)(); const o=a.createOscillator(), g=a.createGain(); o.frequency.value=660; o.connect(g); g.connect(a.destination); g.gain.setValueAtTime(.2,a.currentTime); g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.8); o.start(); o.stop(a.currentTime+.8);}catch(e){}}
 $("go").onclick=toggleTimer;
-document.querySelectorAll("[data-sec]").forEach(b=>b.onclick=()=>{S.sec=+b.dataset.sec; document.querySelectorAll("[data-sec]").forEach(x=>x.classList.toggle("on",x===b)); resetTimer();});
+$("chips").addEventListener("click",e=>{const b=e.target.closest("[data-sec]"); if(!b) return; S.sec=+b.dataset.sec; renderChips(); resetTimer();});
 
 document.addEventListener("click",e=>{const b=e.target.closest("button"); if(b && e.detail>0) b.blur();});
 document.addEventListener("keydown",e=>{
@@ -336,17 +491,18 @@ document.addEventListener("keydown",e=>{
   if(e.target.tagName==="BUTTON" && e.key===" ") return;
   if(e.key==="ArrowRight") go(1);
   else if(e.key==="ArrowLeft") go(-1);
-  else if(e.key===" " && e.target.tagName!=="BUTTON") e.preventDefault();
+  else if(e.key===" ") e.preventDefault();
   else if(e.key.toLowerCase()==="t") toggleTimer();
 });
 
-$("deflist").innerHTML = BARRIERS.map(([n,d])=>`<dt>${n}</dt><dd>${d}</dd>`).join("");
+$("deflist").innerHTML=BARRIERS.map(([n,d])=>`<dt>${n}</dt><dd>${d}</dd>`).join("");
 
 function start(data){
-  const saved = (data && data.teams) ? data : store.get();
-  S.teams = saved && Array.isArray(saved.teams) && saved.teams.length>=2 ? saved.teams : defaultTeams();
-  if(saved && saved.i) S.i = {sib:Math.min(saved.i.sib||0,SIB.length-1), ntb:Math.min(saved.i.ntb||0,NTB.length-1)};
-  if(saved && (saved.game==="sib"||saved.game==="ntb")) S.game=saved.game;
+  const saved=(data&&data.teams)?data:store.get();
+  S.teams=saved&&Array.isArray(saved.teams)&&saved.teams.length>=2?saved.teams:defaultTeams();
+  if(saved&&saved.i) for(const k of Object.keys(GAMES)) S.i[k]=Math.min(saved.i[k]||0,GAMES[k].list.length-1);
+  if(saved&&GAMES[saved.game]) S.game=saved.game;
+  S.sec=GAMES[S.game].def; S.left=S.sec;
   drawClock(); render();
 }
 window.claude?.hot?.snapshot?.(()=>({teams:S.teams,i:S.i,game:S.game}));
